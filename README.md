@@ -29,5 +29,3 @@
 	User- id, email, username, pwd, phone,metadata
 	Category - id, userid,name,description,transactiontype,metadata
 	Transaction - id, userid, amount, categoryid, dateoftransaction, notes, metadata
-	
-	
