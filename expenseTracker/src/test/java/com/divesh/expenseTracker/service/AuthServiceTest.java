@@ -5,12 +5,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-class AuthServiceTest {
-
-    @Test
-    public void testPassword(String password){
-        
-    }
-
-}
+//@SpringBootTest
+//class AuthServiceTest {
+//
+//    @Test
+//    public void testPassword(String password){
+//
+//    }
+//
+//}

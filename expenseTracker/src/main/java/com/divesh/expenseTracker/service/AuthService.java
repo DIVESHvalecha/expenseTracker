@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -42,6 +43,7 @@ public class AuthService {
             throw new InvalidEmailException();
         }
         System.out.println("Reached to service");
+        password = encodePassword(password);
         authRepository.register(name, userName, phoneNo, email, password);
     }
 
@@ -51,5 +53,10 @@ public class AuthService {
         Pattern pattern = Pattern.compile(REGEX);
         Matcher matcher = pattern.matcher(email);
         return matcher.matches();
+    }
+
+    private String encodePassword(String password){
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        return encoder.encode(password);
     }
 }

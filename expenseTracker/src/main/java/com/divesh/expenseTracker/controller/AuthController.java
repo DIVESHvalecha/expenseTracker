@@ -38,9 +38,8 @@ public class AuthController {
         }
     }
 
-    //    check email validity
-    //    email already exists
-    //    username already exists
-    //    Hash Pwd before register
-    //    if all passed then call repository
+    // frontend register page
+    // frontend login page
+    // forgot password page (jaha email lega)
+    // validate email
 }
