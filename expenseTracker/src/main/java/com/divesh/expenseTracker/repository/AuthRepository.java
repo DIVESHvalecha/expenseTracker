@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 @Repository
 public class AuthRepository {
@@ -17,6 +18,11 @@ public class AuthRepository {
     public void register(String name, String userName, String phoneNo, String email, String password){
         String query = "INSERT INTO users (name, username, password, email, phone_no) VALUES (?, ?, ?, ?, ?)";
         jdbcTemplate.update(query,name, userName, password, email, phoneNo );
+    }
+
+    public void forgotPassword(long id, String uuid, LocalDateTime expiryTime) {
+        String query = "INSERT INTO auth_tokens (user_id, token, expiry) VALUES (?, ?, ?)";
+        jdbcTemplate.update(query, id, uuid, expiryTime);
     }
 
     public User findByEmail(String email){
@@ -55,5 +61,21 @@ public class AuthRepository {
         }catch(EmptyResultDataAccessException e){
             return null;
         }
+    }
+
+    public Integer validateToken(String token, LocalDateTime currentTime){
+        String query = "select user_id from auth_tokens where token like (?) AND used_yn = 0 AND expiry > current_timestamp";
+        try{
+            return (Integer) jdbcTemplate.queryForMap(query, token).get("user_id");
+        }catch(EmptyResultDataAccessException e){
+            return null;
+        }
+    }
+
+    public void resetPassword(Integer userId, String password) {
+        String updateUser = "update users set password = ? where user_id = ?";
+        String updateAuth = "update auth_tokens set used_yn = 1 where user_id = ?";
+        jdbcTemplate.update(updateUser, password, userId);
+        jdbcTemplate.update(updateAuth, userId);
     }
 }

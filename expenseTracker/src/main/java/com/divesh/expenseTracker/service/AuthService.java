@@ -2,6 +2,7 @@ package com.divesh.expenseTracker.service;
 
 import com.divesh.expenseTracker.exceptions.EmailAlreadyExists;
 import com.divesh.expenseTracker.exceptions.InvalidEmailException;
+import com.divesh.expenseTracker.exceptions.InvalidToken;
 import com.divesh.expenseTracker.exceptions.UserNameAlreadyTakenException;
 import com.divesh.expenseTracker.models.User;
 import com.divesh.expenseTracker.repository.AuthRepository;
@@ -11,8 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
 
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +25,9 @@ public class AuthService {
 
     @Autowired
     AuthRepository authRepository;
+
+    @Autowired
+    EmailService emailService;
 
 //    Logger logger = LoggerFactory.getLogger(AuthService.class);
     Logger logger = LoggerFactory.getLogger(AuthService.class);
@@ -58,5 +65,45 @@ public class AuthService {
     private String encodePassword(String password){
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         return encoder.encode(password);
+    }
+
+    public void forgotPassword(Map<String, String> body) throws InvalidEmailException {
+        String email = body.get("email");
+        User user = authRepository.findByEmail(email);
+        if(user == null){
+            throw new InvalidEmailException();
+        }
+        String uuid = UUID.randomUUID().toString();
+        LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(15);
+        authRepository.forgotPassword(user.getId(), uuid, expiryTime);
+        sendFrogotMail(uuid, email);
+    }
+
+    public void sendFrogotMail(String uuid, String email){
+        final String FRONTENDURL = "http://localhost:5173/reset-password/"+uuid;
+
+        emailService.sendEmail(email, FRONTENDURL);
+    }
+
+    public void validateToken(Map<String, String> body) throws InvalidToken{
+        String token = body.get("token");
+        LocalDateTime currentTime = LocalDateTime.now();
+        Integer user_id = authRepository.validateToken(token, currentTime);
+        if(user_id == null){
+            throw new InvalidToken();
+        }
+    }
+
+    public void resetPassword(Map<String, String> body) throws InvalidToken{
+        String password = body.get("password");
+        String token = body.get("token");
+        LocalDateTime currentTime = LocalDateTime.now();
+        Integer user_id = authRepository.validateToken(token, currentTime);
+        password = encodePassword(password);
+        if(user_id != null){
+            authRepository.resetPassword(user_id, password);
+        }else{
+            throw new InvalidToken();
+        }
     }
 }

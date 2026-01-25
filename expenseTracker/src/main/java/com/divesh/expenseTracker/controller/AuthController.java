@@ -2,6 +2,7 @@ package com.divesh.expenseTracker.controller;
 
 import com.divesh.expenseTracker.exceptions.EmailAlreadyExists;
 import com.divesh.expenseTracker.exceptions.InvalidEmailException;
+import com.divesh.expenseTracker.exceptions.InvalidToken;
 import com.divesh.expenseTracker.exceptions.UserNameAlreadyTakenException;
 import com.divesh.expenseTracker.models.User;
 import com.divesh.expenseTracker.service.AuthService;
@@ -37,6 +38,42 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("body", e.getMessage()));
         }
     }
+
+    @PostMapping("forgot-password")
+    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody Map<String, String> body){
+        try{
+            authService.forgotPassword(body);
+            return ResponseEntity.ok().body(Map.of("body", "Link sent"));
+        }catch (InvalidEmailException e){
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("body", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/validate-token")
+    public ResponseEntity<Map<String, String>> validateToken(@RequestBody Map<String, String> body){
+        try{
+            authService.validateToken(body);
+            return ResponseEntity.ok().body(Map.of("body", "page open"));
+        }catch(InvalidToken e){
+            return ResponseEntity.badRequest().body(Map.of("body", "Invalid token"));
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Map<String, String>> resetPassword(@RequestBody Map<String, String> body){
+        try{
+            authService.resetPassword(body);
+            return ResponseEntity.ok().body(Map.of("body", "password updated successfully"));
+        }catch(InvalidToken e){
+            return ResponseEntity.badRequest().body(Map.of("body", e.getMessage()));
+        }
+    }
+
+//    @PostMapping("/login")
+//    public ResponseEntity<Map<String, String>> login(){
+//
+//    }
 
     // frontend register page
     // frontend login page

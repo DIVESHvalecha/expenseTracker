@@ -13,6 +13,10 @@ create table users(
     active_yn int default 1
 );
 
+
+ALTER TABLE users
+ADD UNIQUE (username);
+
 create table categories(
 	category_id INT primary key auto_increment,
 	user_id INT not null,
@@ -20,9 +24,9 @@ create table categories(
     name varchar(30) not null,
     description varchar(50),
     icon_url varchar(255) not null,
-
+    
     type enum ('income' , 'expense') not null default 'expense',
-
+    
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     active_yn int default 1
@@ -41,6 +45,16 @@ create table transactions(
     updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     active_yn int default 1
 );
+
+create table auth_tokens(
+	token VARCHAR(255) PRIMARY KEY,
+    user_id INT NOT NULL,
+    expiry TIMESTAMP,
+    used_yn BOOLEAN DEFAULT FALSE,
+    foreign key (user_id) references users(user_id) on delete cascade
+);
+
+select * from auth_tokens where token like "fc2bff6b-cc2d-4f39-bcd7-cb6260393459" AND used_yn = 0;
 
 INSERT INTO users (name, username, password, email, phone_no)
 VALUES
