@@ -78,4 +78,17 @@ public class AuthRepository {
         jdbcTemplate.update(updateUser, password, userId);
         jdbcTemplate.update(updateAuth, userId);
     }
+
+    public String checkIfTokenExists(long userId, LocalDateTime currentTime){
+        String query = "select token from auth_tokens where user_id like (?) AND used_yn = 0 AND expiry > current_timestamp";
+        String updateQuery = "update auth_tokens set expiry = (?) where user_id = (?)";
+        try{
+            String token = (String) jdbcTemplate.queryForMap(query, userId).get("token");
+            LocalDateTime expiryTime = currentTime.plusMinutes(15);
+            jdbcTemplate.update(updateQuery, expiryTime, userId);
+            return token;
+        }catch (EmptyResultDataAccessException e){
+            return null;
+        }
+    }
 }

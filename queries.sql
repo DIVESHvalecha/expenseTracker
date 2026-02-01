@@ -54,6 +54,11 @@ create table auth_tokens(
     foreign key (user_id) references users(user_id) on delete cascade
 );
 
+update auth_tokens set expiry = (?) where user_id = (?);
+
+TRUNCATE TABLE auth_tokens;
+select * from auth_tokens;
+
 select * from auth_tokens where token like "fc2bff6b-cc2d-4f39-bcd7-cb6260393459" AND used_yn = 0;
 
 INSERT INTO users (name, username, password, email, phone_no)
@@ -88,4 +93,7 @@ VALUES
 
 SELECT * FROM users;
 SELECT * FROM categories;
+SELECT category_id, user_id, name, description, icon_url, type, active_yn from categories;
+update categories set user_id = ?, name = ?, description = ?, icon_url = ?, type = ? where category_id = ?;
+
 SELECT * FROM transactions;

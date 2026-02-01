@@ -39,7 +39,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping("forgot-password")
+    @PostMapping("/forgot-password")
     public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody Map<String, String> body){
         try{
             authService.forgotPassword(body);
@@ -69,14 +69,4 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("body", e.getMessage()));
         }
     }
-
-//    @PostMapping("/login")
-//    public ResponseEntity<Map<String, String>> login(){
-//
-//    }
-
-    // frontend register page
-    // frontend login page
-    // forgot password page (jaha email lega)
-    // validate email
 }

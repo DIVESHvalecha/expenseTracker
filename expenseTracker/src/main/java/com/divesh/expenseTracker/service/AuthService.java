@@ -73,9 +73,16 @@ public class AuthService {
         if(user == null){
             throw new InvalidEmailException();
         }
-        String uuid = UUID.randomUUID().toString();
-        LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(15);
-        authRepository.forgotPassword(user.getId(), uuid, expiryTime);
+        LocalDateTime currentTime = LocalDateTime.now();
+        String token = authRepository.checkIfTokenExists(user.getId(), currentTime);
+        String uuid;
+        if(token == null){
+            uuid = UUID.randomUUID().toString();
+            LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(15);
+            authRepository.forgotPassword(user.getId(), uuid, expiryTime);
+        }else{
+            uuid = token;
+        }
         sendFrogotMail(uuid, email);
     }
 

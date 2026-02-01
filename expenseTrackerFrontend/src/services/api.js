@@ -2,9 +2,27 @@ const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
 // Mock Data
 let categories = [
-  { id: '1', name: 'Food', color: '#88B857' },
-  { id: '2', name: 'Rent', color: '#9ED36A' },
-  { id: '3', name: 'Entertainment', color: '#AAB7A1' },
+  { 
+    id: '1', 
+    name: 'Food', 
+    type: 'expense',
+    description: 'Groceries, dining out, and snacks',
+    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&h=200&fit=crop'
+  },
+  { 
+    id: '2', 
+    name: 'Rent', 
+    type: 'expense',
+    description: 'Monthly apartment rent and utilities',
+    image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=200&h=200&fit=crop'
+  },
+  { 
+    id: '3', 
+    name: 'Entertainment', 
+    type: 'expense',
+    description: 'Movies, games, and streaming services',
+    image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=200&h=200&fit=crop'
+  },
 ];
 
 let transactions = [
@@ -105,11 +123,21 @@ const api = {
       await delay(500);
       return [...categories];
     },
-    create: async (category) => {
-      await delay(500);
-      const newCategory = { ...category, id: Date.now().toString() };
-      categories.push(newCategory);
-      return newCategory;
+    create: async (categoryData) => {
+      const response = await fetch('http://localhost:8080/categories', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(categoryData),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.body || 'Failed to create category');
+      }
+
+      return response.json();
     },
     delete: async (id) => {
       await delay(500);

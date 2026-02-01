@@ -82,6 +82,13 @@ const useStore = create((set, get) => ({
   },
 
   addCategory: async (category) => {
+    category = {
+      name: category.name,
+      description: category.description,
+      url: category.image,
+      type: category.type,
+      userId: 1
+    };
     const newCategory = await api.categories.create(category);
     set(state => ({ categories: [...state.categories, newCategory] }));
   },
