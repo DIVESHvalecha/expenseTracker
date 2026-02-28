@@ -82,20 +82,32 @@ const useStore = create((set, get) => ({
   },
 
   addCategory: async (category) => {
-    category = {
+    const categoryData = {
       name: category.name,
       description: category.description,
-      url: category.image,
+      url: category.url,
       type: category.type,
       userId: 1
     };
-    const newCategory = await api.categories.create(category);
-    set(state => ({ categories: [...state.categories, newCategory] }));
+    await api.categories.create(categoryData);
+    await get().fetchCategories();
+  },
+
+  updateCategory: async (id, category) => {
+    const categoryData = {
+      name: category.name,
+      description: category.description,
+      url: category.url,
+      type: category.type,
+      userId: 1
+    };
+    await api.categories.update(id, categoryData);
+    await get().fetchCategories();
   },
 
   deleteCategory: async (id) => {
     await api.categories.delete(id);
-    set(state => ({ categories: state.categories.filter(c => c.id !== id) }));
+    await get().fetchCategories();
   },
 
   // Transaction Actions

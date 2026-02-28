@@ -2,23 +2,23 @@ const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
 // Mock Data
 let categories = [
-  { 
-    id: '1', 
-    name: 'Food', 
+  {
+    id: '1',
+    name: 'Food',
     type: 'expense',
     description: 'Groceries, dining out, and snacks',
     image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&h=200&fit=crop'
   },
-  { 
-    id: '2', 
-    name: 'Rent', 
+  {
+    id: '2',
+    name: 'Rent',
     type: 'expense',
     description: 'Monthly apartment rent and utilities',
     image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=200&h=200&fit=crop'
   },
-  { 
-    id: '3', 
-    name: 'Entertainment', 
+  {
+    id: '3',
+    name: 'Entertainment',
     type: 'expense',
     description: 'Movies, games, and streaming services',
     image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=200&h=200&fit=crop'
@@ -33,13 +33,29 @@ let transactions = [
 const api = {
   auth: {
     login: async (email, password) => {
-      await delay(1000);
-      if (email === 'demo@example.com' && password === 'password') {
-        const user = { id: '1', name: 'Demo User', email };
-        localStorage.setItem('user', JSON.stringify(user));
-        return user;
+      const response = await fetch(`http://localhost:8080/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          email: email,
+          password: password
+        }),
+        credentials: 'include',
+        redirect: 'manual', // IMPORTANT
+      });
+
+      if (response.status === 200 || response.status === 302) {
+        // Login successful, session cookie is set
+        const userData = { success: true, email };
+        localStorage.setItem('user', JSON.stringify(userData));
+        return userData;
       }
-      throw new Error('Invalid credentials');
+
+      const errorData = await response.json().catch(() => ({}));
+      // console.log(errorData);
+      throw new Error(errorData.error || 'Login failed');
     },
     register: async (name, username, email, phoneNo, password) => {
       const response = await fetch('http://localhost:8080/register', {
@@ -120,8 +136,36 @@ const api = {
 
   categories: {
     getAll: async () => {
-      await delay(500);
-      return [...categories];
+      const response = await fetch('http://localhost:8080/categories', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        redirect: 'manual',
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.body || 'Failed to fetch category');
+      }
+      const data = await response.json();
+      return data;
+    },
+    getById: async (id) => {
+      const response = await fetch(`http://localhost:8080/categories/${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        redirect: 'manual',
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to fetch category');
+      }
+      const data = await response.json();
+      return data.body; // Backend returns { body: categoryObject }
     },
     create: async (categoryData) => {
       const response = await fetch('http://localhost:8080/categories', {
@@ -130,6 +174,8 @@ const api = {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(categoryData),
+        credentials: 'include',
+        redirect: 'manual',
       });
 
       if (!response.ok) {
@@ -139,9 +185,34 @@ const api = {
 
       return response.json();
     },
+    update: async (id, categoryData) => {
+      const response = await fetch(`http://localhost:8080/categories/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(categoryData),
+        credentials: 'include',
+        redirect: 'manual',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.body || 'Failed to update category');
+      }
+
+      return response.json();
+    },
     delete: async (id) => {
-      await delay(500);
-      categories = categories.filter(c => c.id !== id);
+      const response = await fetch(`http://localhost:8080/categories/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        redirect: 'manual',
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.body || 'Failed to delete category');
+      }
       return id;
     }
   },
