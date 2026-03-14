@@ -26,8 +26,8 @@ let categories = [
 ];
 
 let transactions = [
-  { id: '1', title: 'Grocery', amount: 50, categoryId: '1', type: 'expense', date: '2024-03-15' },
-  { id: '2', title: 'Salary', amount: 3000, categoryId: '2', type: 'income', date: '2024-03-01' },
+  { id: '1', note: 'Grocery', amount: 50, categoryId: '1', type: 'expense', date: '2024-03-15' },
+  { id: '2', note: 'Salary', amount: 3000, categoryId: '2', type: 'income', date: '2024-03-01' },
 ];
 
 const api = {
@@ -219,14 +219,39 @@ const api = {
 
   transactions: {
     getAll: async () => {
-      await delay(500);
-      return [...transactions];
+      const response = await fetch(`http://localhost:8080/transactions`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        redirect: 'manual',
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to fetch category');
+      }
+      const data = await response.json();
+      return data.body; // Backend returns { body: categoryObject }
     },
     create: async (transaction) => {
-      await delay(800);
-      const newTransaction = { ...transaction, id: Date.now().toString() };
-      transactions.unshift(newTransaction);
-      return newTransaction;
+      console.log("transaction", transaction);
+      const response = await fetch('http://localhost:8080/transactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(transaction),
+        credentials: 'include',
+        redirect: 'manual',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.body || 'Failed to create transaction');
+      }
+
+      return response.json();
     },
     delete: async (id) => {
       await delay(500);

@@ -94,6 +94,15 @@ VALUES
 SELECT * FROM users;
 SELECT * FROM categories;
 SELECT category_id, user_id, name, description, icon_url, type, active_yn from categories;
+SELECT t.transaction_id, t.user_id, t.category_id, t.amount, t.notes, t.transaction_date, t.active_yn, c.name, c.type
+from transactions t
+inner join  categories c
+on t.category_id = c.category_id
+where t.active_yn = 1 and t.user_id = 12 and t.transaction_date >= ?;
 update categories set user_id = ?, name = ?, description = ?, icon_url = ?, type = ? where category_id = ?;
 
 SELECT * FROM transactions;
+
+update transactions set category_id = ?, amount = ?, transaction_date = ?, notes = ? where transaction_id = ? and active_yn = ? and user_id = ?;
+
+INSERT INTO transactions (category_id, user_id, amount, transaction_date, notes) VALUES (?, ?, ?, ?, ?);

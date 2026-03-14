@@ -6,7 +6,6 @@ import GlassCard from '../ui/GlassCard';
 const TransactionList = () => {
     const { transactions, categories, deleteTransaction } = useStore();
 
-    const getCategoryName = (id) => categories.find(c => c.id === id)?.name || 'Uncategorized';
     const getCategoryColor = (id) => categories.find(c => c.id === id)?.color || '#AAB7A1';
 
     return (
@@ -39,28 +38,28 @@ const TransactionList = () => {
                                 <GlassCard className="!p-4 hover:border-white/20 transition-all">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-4">
-                                            <div className={`p-2 rounded-xl border ${t.type === 'income' ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-red-500/10 border-red-500/20 text-red-400'
+                                            <div className={`p-2 rounded-xl border ${t.categoryType === 'INCOME' ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-red-500/10 border-red-500/20 text-red-400'
                                                 }`}>
-                                                {t.type === 'income' ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+                                                {t.categoryType === 'INCOME' ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
                                             </div>
                                             <div>
-                                                <h4 className="font-semibold text-text">{t.title}</h4>
+                                                <h4 className="font-semibold text-text">{t.note}</h4>
                                                 <div className="flex items-center gap-3 text-xs text-text-muted mt-0.5">
                                                     <span className="flex items-center gap-1">
                                                         <Calendar size={12} /> {t.date}
                                                     </span>
                                                     <span className="flex items-center gap-1">
                                                         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: getCategoryColor(t.categoryId) }} />
-                                                        {getCategoryName(t.categoryId)}
+                                                        {(t.categoryName)}
                                                     </span>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div className="flex items-center gap-4">
-                                            <span className={`text-lg font-bold font-serif ${t.type === 'income' ? 'text-primary' : 'text-red-400'
+                                            <span className={`text-lg font-bold font-serif ${t.categoryType === 'INCOME' ? 'text-primary' : 'text-red-400'
                                                 }`}>
-                                                {t.type === 'income' ? '+' : '-'}${t.amount.toFixed(2)}
+                                                {t.categoryType === 'INCOME' ? '+' : '-'}${t.amount.toFixed(2)}
                                             </span>
                                             <button
                                                 onClick={() => deleteTransaction(t.id)}

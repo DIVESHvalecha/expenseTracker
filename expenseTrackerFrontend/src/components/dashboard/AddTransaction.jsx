@@ -10,7 +10,7 @@ const AddTransaction = () => {
     const { categories, addTransaction } = useStore();
     const [type, setType] = useState('expense');
     const [formData, setFormData] = useState({
-        title: '',
+        note: '',
         amount: '',
         categoryId: '',
         date: new Date().toISOString().split('T')[0]
@@ -30,7 +30,7 @@ const AddTransaction = () => {
                 type
             });
             setFormData({
-                title: '',
+                note: '',
                 amount: '',
                 categoryId: '',
                 date: new Date().toISOString().split('T')[0]
@@ -44,8 +44,8 @@ const AddTransaction = () => {
     return (
         <GlassCard className="border-primary/20">
             <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold">New Entry</h3>
-                <div className="flex bg-background-darker/50 p-1 rounded-xl border border-white/10">
+                <h3 className="text-xl font-bold text-text">New Entry</h3>
+                {/* <div className="flex bg-background-darker/50 p-1 rounded-xl border border-white/10">
                     <button
                         onClick={() => setType('expense')}
                         className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${type === 'expense' ? 'bg-primary text-background-darker' : 'text-text-muted hover:text-text'
@@ -60,15 +60,15 @@ const AddTransaction = () => {
                     >
                         Income
                     </button>
-                </div>
+                </div> */}
             </div>
 
             <form onSubmit={handleSubmit} className="grid sm:grid-cols-2 gap-4">
                 <Input
                     label="Title"
                     placeholder="e.g. Rent, Freelancing"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    value={formData.note}
+                    onChange={(e) => setFormData({ ...formData, note: e.target.value })}
                     required
                 />
                 <Input
@@ -85,7 +85,14 @@ const AddTransaction = () => {
                     <select
                         className="glass-input h-10 appearance-none bg-background-lighter"
                         value={formData.categoryId}
-                        onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                        onChange={(e) => {
+                            const categoryId = e.target.value;
+                            const selectedCategory = categories.find(c => c.id == categoryId);
+                            setFormData({ ...formData, categoryId });
+                            if (selectedCategory) {
+                                setType(selectedCategory.type.toLowerCase());
+                            }
+                        }}
                         required
                     >
                         <option value="">Select Category</option>
