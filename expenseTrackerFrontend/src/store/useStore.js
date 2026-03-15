@@ -122,9 +122,22 @@ const useStore = create((set, get) => ({
     set(state => ({ transactions: [newTransaction, ...state.transactions] }));
   },
 
+  updateTransaction: async (id, transaction) => {
+    await api.transactions.update(id, transaction);
+    await get().fetchTransactions();
+  },
+
   deleteTransaction: async (id) => {
     await api.transactions.delete(id);
-    set(state => ({ transactions: state.transactions.filter(t => t.id !== id) }));
+    set(state => ({ transactions: state.transactions.filter(t => t.transactionId !== id) }));
+  },
+
+  bulkUploadTransactions: async (file) => {
+    const results = await api.transactions.bulkUpload(file);
+    // After bulk upload, if some were successful, we should probably fresh the main list
+    // But since this is a simulation for now, we just return the results for the UI to display
+    await get().fetchTransactions();
+    return results;
   }
 }));
 

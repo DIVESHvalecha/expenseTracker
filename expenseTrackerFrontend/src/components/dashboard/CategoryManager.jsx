@@ -87,7 +87,7 @@ const CategoryManager = () => {
     };
 
     return (
-        <GlassCard className="flex flex-col h-full">
+        <GlassCard className="flex flex-col">
             <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-bold flex items-center gap-2">
                     <Tag size={20} className="text-primary" />
@@ -177,7 +177,7 @@ const CategoryManager = () => {
                 </form>
             )}
 
-            <div className="flex flex-col gap-3 overflow-y-auto pr-2 custom-scrollbar">
+            <div className="flex flex-col gap-2 overflow-y-auto pr-2 custom-scrollbar max-h-[400px]">
                 {categories.length === 0 ? (
                     <div className="text-center py-10 opacity-50">
                         <Tag size={40} className="mx-auto mb-3 opacity-20" />
@@ -187,9 +187,9 @@ const CategoryManager = () => {
                     categories.map((category) => (
                         <div
                             key={category.id}
-                            className="group relative flex items-start gap-4 p-3 rounded-2xl border border-white/10 bg-white/5 hover:border-primary/40 hover:bg-white/10 transition-all overflow-hidden"
+                            className="group relative flex items-start gap-3 p-2 rounded-xl border border-white/10 bg-white/5 hover:border-primary/40 hover:bg-white/10 transition-all overflow-hidden"
                         >
-                            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 border border-white/10 bg-primary/10 text-2xl">
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 border border-white/10 bg-primary/10 text-xl">
                                 {category.url || '💰'}
                             </div>
 

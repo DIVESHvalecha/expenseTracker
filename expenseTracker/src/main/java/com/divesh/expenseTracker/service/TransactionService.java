@@ -37,6 +37,8 @@ public class TransactionService {
     CategoryController categoryController;
     @Autowired
     CategoryService categoryService;
+    @Autowired
+    AiService aiService;
 
     public void createTransaction(String email, Transaction transaction) {
         User user = authRepository.findByEmail(email);
@@ -105,10 +107,19 @@ public class TransactionService {
             }catch (NumberFormatException e){
                 list.add("please enter amount in correct format");
             }
+
+            if(amount <= 0.0){
+                list.add("amount is invalid and is negative");
+            }
             String note = rowData[1];
             String categoryName = rowData[2].toLowerCase().trim();
-            if (categoryName.isEmpty()){
-                list.add("Category is not defined");
+            if (categoryName.trim().isEmpty()){
+                //get category from prompt;
+                //note
+                //list of categories
+                List<Category> categories = categoryRepository.getCategories(userId);
+                aiService.suggestCategory(note, categories);
+
             }
             LocalDate date = LocalDate.now();
             try {
@@ -117,6 +128,9 @@ public class TransactionService {
                 list.add("Please add date in correct format");
             }
             String type = rowData[4].toUpperCase().trim();
+            if(!type.equals("INCOME") && !type.equals("EXPENSE")){
+                list.add("type is not specified");
+            }
 
             log.info("Row is {}, {}, {}, {}, {}", amount, note, categoryName, date, type);
             if(!list.isEmpty()){

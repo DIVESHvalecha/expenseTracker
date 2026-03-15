@@ -1,5 +1,6 @@
 package com.divesh.expenseTracker.service;
 
+import com.divesh.expenseTracker.models.Category;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ public class AiService {
     @Autowired
     ChatModel chatModel;
 
-    public String suggestCategory(String description, List<String> categories){
+    public String suggestCategory(String description, List<Category> categories){
         String prompt = """
                 Categorize this description : {description}.
                 Available categories : {categories}

@@ -80,8 +80,8 @@ public class TransactionController {
         }
     }
 
-    @GetMapping("/prompt/{note}")
-    public String suggestCategories(@PathVariable(name = "note") String note){
-        return aiService.suggestCategory(note, List.of("sports", "education", "business", "food"));
-    }
+//    @GetMapping("/prompt/{note}")
+//    public String suggestCategories(@PathVariable(name = "note") String note){
+//        return aiService.suggestCategory(note, List.of("sports", "education", "business", "food"));
+//    }
 }

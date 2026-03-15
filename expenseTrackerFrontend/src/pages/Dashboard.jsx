@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import useStore from '../store/useStore';
 import CategoryManager from '../components/dashboard/CategoryManager';
 import AddTransaction from '../components/dashboard/AddTransaction';
+import BulkUpload from '../components/dashboard/BulkUpload';
 import TransactionList from '../components/dashboard/TransactionList';
 import GlassCard from '../components/ui/GlassCard';
 import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
@@ -55,6 +56,7 @@ const Dashboard = () => {
                 <div className="lg:col-span-4 space-y-6">
                     <CategoryManager />
                     <AddTransaction />
+                    <BulkUpload />
                 </div>
                 <div className="lg:col-span-8">
                     <TransactionList />
