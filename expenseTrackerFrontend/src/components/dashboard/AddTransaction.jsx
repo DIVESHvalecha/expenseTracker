@@ -26,6 +26,7 @@ const AddTransaction = () => {
         try {
             await addTransaction({
                 ...formData,
+                CategoryId: formData.categoryId,
                 amount: parseFloat(formData.amount),
                 type
             });

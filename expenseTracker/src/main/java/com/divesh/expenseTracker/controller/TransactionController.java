@@ -2,6 +2,7 @@ package com.divesh.expenseTracker.controller;
 
 import com.divesh.expenseTracker.exceptions.TransactionDoesntExist;
 import com.divesh.expenseTracker.models.Transaction;
+import com.divesh.expenseTracker.service.AiService;
 import com.divesh.expenseTracker.service.TransactionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ public class TransactionController {
 
     @Autowired
     TransactionService transactionService;
+    @Autowired
+    AiService aiService;
 
     @PostMapping
     public ResponseEntity<Map<String, String>> createTransaction(Authentication auth, @RequestBody Transaction transaction){
@@ -38,6 +41,7 @@ public class TransactionController {
     public ResponseEntity<Map<String, Object>> getTransactions(Authentication auth, @RequestParam(name = "category" , required = false) String category, @RequestParam(name = "start" , required = false) LocalDate start, @RequestParam(name = "end" , required = false) LocalDate end, @RequestParam(name = "type" , required = false) String type, @RequestParam(name = "sortBy", defaultValue = "transaction_date") String sortBy, @RequestParam(name = "orderBy", defaultValue = "DESC") String orderBy, @RequestParam(name = "pageNo", required = false) Integer pageNo, @RequestParam(name = "itemSize", required = false) Integer itemSize){
         try{
             List<Transaction> result = transactionService.getTransactions(auth.getName(), category, start, end, type, sortBy, orderBy, pageNo, itemSize);
+            log.info("Getting transactions {}", result);
             return ResponseEntity.ok().body(Map.of("body", result));
         }catch (Exception e){
             return  ResponseEntity.badRequest().body(Map.of("body", e.getMessage()));
@@ -67,15 +71,17 @@ public class TransactionController {
     }
 
     @PostMapping("/bulk-upload")
-    public void bulkUpload(@RequestParam(name = "file") MultipartFile file){
-        log.info(file.getOriginalFilename());
-        log.info(file.getContentType());
-        log.info(String.valueOf(file.getSize()));
-
+    public ResponseEntity<Map<String, Object>> bulkUpload(@RequestParam(name = "file") MultipartFile file, Authentication auth){
         try {
-            transactionService.read(file);
+            List<List<String>> exceptions = transactionService.read(file, auth.getName());
+            return ResponseEntity.ok().body(Map.of("body", exceptions));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @GetMapping("/prompt/{note}")
+    public String suggestCategories(@PathVariable(name = "note") String note){
+        return aiService.suggestCategory(note, List.of("sports", "education", "business", "food"));
     }
 }

@@ -229,13 +229,30 @@ const api = {
       });
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Failed to fetch category');
+        throw new Error(data.error || 'Failed to fetch tracking details');
       }
       const data = await response.json();
-      return data.body; // Backend returns { body: categoryObject }
+      return data.body;
+    },
+    getById: async (id) => {
+      const response = await fetch(`http://localhost:8080/transactions/${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        redirect: 'manual',
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Failed to fetch transaction');
+      }
+      const text = await response.text();
+      if (!text) return {};
+      const data = JSON.parse(text);
+      return data.body !== undefined ? data.body : data;
     },
     create: async (transaction) => {
-      console.log("transaction", transaction);
       const response = await fetch('http://localhost:8080/transactions', {
         method: 'POST',
         headers: {
@@ -251,12 +268,59 @@ const api = {
         throw new Error(data.body || 'Failed to create transaction');
       }
 
-      return response.json();
+      const data = await response.json();
+      return data.body || data;
+    },
+    update: async (id, transaction) => {
+      const response = await fetch(`http://localhost:8080/transactions/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(transaction),
+        credentials: 'include',
+        redirect: 'manual',
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Failed to update transaction');
+      }
+
+      const text = await response.text();
+      if (!text) return {};
+      const data = JSON.parse(text);
+      return data.body || data;
     },
     delete: async (id) => {
-      await delay(500);
-      transactions = transactions.filter(t => t.id !== id);
+      const response = await fetch(`http://localhost:8080/transactions/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        redirect: 'manual',
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Failed to delete transaction');
+      }
       return id;
+    },
+    bulkUpload: async (file) => {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(`http://localhost:8080/transactions/bulk-upload`, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.body || 'Bulk upload failed');
+      }
+
+      return response.json();
     }
   },
 

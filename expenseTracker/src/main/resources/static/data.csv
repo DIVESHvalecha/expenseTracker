@@ -1,4 +1,2 @@
-amount,note,category,date
-500.00,Pizza,Food,2026-02-12
-700.00,Top,Fashion,2026-02-10
-800.00,Movie,Entertainment,2025-01-12
+amount,note,category,date,type
+7000.0,Pizza,cricket,2026-03-10,EXPENSE

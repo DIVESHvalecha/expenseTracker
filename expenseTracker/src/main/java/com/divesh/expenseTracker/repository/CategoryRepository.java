@@ -37,6 +37,15 @@ public class CategoryRepository {
         }
     }
 
+    public Category getCategoryByName(String name, long userId, String type){
+        String query = "SELECT category_id, user_id, name, description, icon_url, type, active_yn from categories WHERE name = ? AND user_id = ? AND type = ? AND active_yn = 1";
+        try{
+            return jdbcTemplate.queryForObject(query,  new CategoryRowMapper(), name, userId, type);
+        }catch(EmptyResultDataAccessException e){
+            return null;
+        }
+    }
+
     public void updateCategory(int id, long userId, String name, String description, String url, String type) {
         String query = "update categories set name = ?, description = ?, icon_url = ?, type = ? where category_id = ? and user_id = ? and active_yn = 1";
         jdbcTemplate.update(query, name, description, url, type, id, userId);
