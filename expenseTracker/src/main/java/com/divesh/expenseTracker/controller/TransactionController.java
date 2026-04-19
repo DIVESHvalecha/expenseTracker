@@ -1,6 +1,7 @@
 package com.divesh.expenseTracker.controller;
 
 import com.divesh.expenseTracker.exceptions.TransactionDoesntExist;
+import com.divesh.expenseTracker.models.BulkUploadResponse;
 import com.divesh.expenseTracker.models.Transaction;
 import com.divesh.expenseTracker.service.AiService;
 import com.divesh.expenseTracker.service.TransactionService;
@@ -73,7 +74,7 @@ public class TransactionController {
     @PostMapping("/bulk-upload")
     public ResponseEntity<Map<String, Object>> bulkUpload(@RequestParam(name = "file") MultipartFile file, Authentication auth){
         try {
-            List<List<String>> exceptions = transactionService.read(file, auth.getName());
+            List<BulkUploadResponse> exceptions = transactionService.read(file, auth.getName());
             return ResponseEntity.ok().body(Map.of("body", exceptions));
         } catch (IOException e) {
             throw new RuntimeException(e);

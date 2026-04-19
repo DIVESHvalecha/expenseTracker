@@ -19,8 +19,10 @@ public class AiService {
                 Categorize this description : {description}.
                 Available categories : {categories}
                 
+                the category has the fields id, userId, name, description, url, type(income || expense) and active_yn
+                
                 Rules:
-                1. pick one from the list of categories if possible
+                1. From the category list try to get the name or description and even type and active yn and give me only the name of any one category that matches the given description.
                 2. If not give me a new valid category
                 3. Answer must be exactly in one word.
                 """;

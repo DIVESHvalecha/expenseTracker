@@ -40,7 +40,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	testImplementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.ai:spring-ai-starter-model-google-genai:2.0.0-M2'
-
+	implementation 'com.github.librepdf:openpdf:3.0.3'
 }
 
 tasks.named('test') {

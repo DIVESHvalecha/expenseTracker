@@ -35,6 +35,7 @@ public class Transaction {
                 ", activeYn=" + activeYn +
                 ", categoryName='" + categoryName + '\'' +
                 ", categoryType='" + categoryType + '\'' +
+                "\n"+
                 '}';
     }
 }

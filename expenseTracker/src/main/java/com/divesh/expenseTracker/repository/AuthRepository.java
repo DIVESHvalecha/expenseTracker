@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public class AuthRepository {
@@ -90,5 +91,10 @@ public class AuthRepository {
         }catch (EmptyResultDataAccessException e){
             return null;
         }
+    }
+
+    public List<String> findAllEmails() {
+        String query = "SELECT email FROM users WHERE active_yn = 1";
+        return jdbcTemplate.queryForList(query, String.class);
     }
 }

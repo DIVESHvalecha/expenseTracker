@@ -2,6 +2,7 @@ package com.divesh.expenseTracker.service;
 
 import com.divesh.expenseTracker.controller.CategoryController;
 import com.divesh.expenseTracker.exceptions.TransactionDoesntExist;
+import com.divesh.expenseTracker.models.BulkUploadResponse;
 import com.divesh.expenseTracker.models.Category;
 import com.divesh.expenseTracker.models.Transaction;
 import com.divesh.expenseTracker.models.User;
@@ -86,8 +87,8 @@ public class TransactionService {
         transactionRepository.deleteTransaction(id, userId);
     }
 
-    public List<List<String>> read(MultipartFile file, String email) throws IOException {
-        List<List<String>> exceptions = new ArrayList<>();
+    public List<BulkUploadResponse> read(MultipartFile file, String email) throws IOException {
+        List<BulkUploadResponse> exceptions = new ArrayList<>();
 
         User user = authRepository.findByEmail(email);
         Long userId = user.getId();
@@ -95,6 +96,7 @@ public class TransactionService {
         Scanner scanner = new Scanner(file.getInputStream());
         scanner.nextLine();
         while(scanner.hasNext()){
+            BulkUploadResponse bulkUploadResponse = new BulkUploadResponse();
             List<String> list = new ArrayList<>();
             String row = scanner.nextLine();
             String[] rowData = row.split(",");
@@ -102,39 +104,46 @@ public class TransactionService {
                 list.add("Some of the fields are empty");
             }
             Double amount = 0.0;
+            bulkUploadResponse.setAmount(rowData[0]);
             try{
                 amount = Double.valueOf(rowData[0]);
+                if(amount <= 0.0){
+                    list.add("amount is invalid and is negative");
+                }
             }catch (NumberFormatException e){
                 list.add("please enter amount in correct format");
             }
 
-            if(amount <= 0.0){
-                list.add("amount is invalid and is negative");
-            }
+
             String note = rowData[1];
+            bulkUploadResponse.setNote(note);
             String categoryName = rowData[2].toLowerCase().trim();
+
             if (categoryName.trim().isEmpty()){
                 //get category from prompt;
                 //note
                 //list of categories
                 List<Category> categories = categoryRepository.getCategories(userId);
-                aiService.suggestCategory(note, categories);
-
+                categoryName = aiService.suggestCategory(note, categories);
             }
             LocalDate date = LocalDate.now();
+            bulkUploadResponse.setDate(rowData[3]);
             try {
                 date = LocalDate.parse(rowData[3]);
             }catch (DateTimeParseException e){
                 list.add("Please add date in correct format");
             }
             String type = rowData[4].toUpperCase().trim();
+            bulkUploadResponse.setType(type);
             if(!type.equals("INCOME") && !type.equals("EXPENSE")){
                 list.add("type is not specified");
             }
 
             log.info("Row is {}, {}, {}, {}, {}", amount, note, categoryName, date, type);
             if(!list.isEmpty()){
-                exceptions.add(list);
+                bulkUploadResponse.setCategoryName(categoryName);
+                bulkUploadResponse.setErrors(list);
+                exceptions.add(bulkUploadResponse);
                 continue;
             }
             Category result = categoryRepository.getCategoryByName(categoryName, userId, type);
@@ -150,6 +159,7 @@ public class TransactionService {
                 result = categoryRepository.getCategoryByName(categoryName, userId, type);
             }
 
+            bulkUploadResponse.setCategoryName(result.getName());
             Transaction transaction = new Transaction();
             transaction.setNote(note);
             transaction.setCategoryId(result.getId());
@@ -157,7 +167,8 @@ public class TransactionService {
             transaction.setAmount(amount);
 
             this.createTransaction(email, transaction);
-            exceptions.add(list);
+            bulkUploadResponse.setErrors(list);
+            exceptions.add(bulkUploadResponse);
         }
         return exceptions;
     }

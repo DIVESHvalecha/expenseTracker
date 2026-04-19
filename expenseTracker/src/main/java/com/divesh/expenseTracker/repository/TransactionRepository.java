@@ -74,9 +74,9 @@ public class TransactionRepository {
             sortBy = "t.transaction_date";
         }
 
-        if(orderBy.compareToIgnoreCase("ASC")==0){
+        if(orderBy != null && orderBy.compareToIgnoreCase("ASC")==0){
             orderBy = "ASC";
-        } else if (orderBy.compareToIgnoreCase("DESC")==0) {
+        } else if (orderBy != null && orderBy.compareToIgnoreCase("DESC")==0) {
             orderBy = "DESC";
         }else{
             orderBy = "DESC";
@@ -94,8 +94,6 @@ public class TransactionRepository {
             params.add(((pageNo-1)*itemSize));
         }
 
-//        log.info(query.toString());
-//        log.info(params.toString());
         return jdbcTemplate.query(query.toString(), new TransactionRowMapper(), params.toArray());
     }
 

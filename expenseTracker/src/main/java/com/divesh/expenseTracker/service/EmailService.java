@@ -3,6 +3,8 @@ package com.divesh.expenseTracker.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMailMessage;
@@ -43,6 +45,23 @@ public class EmailService {
 //            messageHelper.setText(token);
             messageHelper.setSubject("Reset password - Expense Tracker");
             messageHelper.setText(html, true);
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+        javaMailSender.send(message);
+    }
+
+    public void sendReport(String to, byte[] report, String subject) throws MessagingException {
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        MimeMessageHelper messageHelper = new MimeMessageHelper(message, true);
+
+        try {
+            messageHelper.setTo(to);
+            messageHelper.setSubject(subject);
+            messageHelper.setText("Find your report attached below");
+            Resource resource = new ByteArrayResource(report);
+            messageHelper.addAttachment("WeeklyReport.pdf", resource);
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
